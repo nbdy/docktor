@@ -2,6 +2,8 @@ import docker
 from time import sleep
 from loguru import logger
 from threading import Thread
+from stem.control import Controller
+from stem import Signal
 
 
 class Manager(Thread):
@@ -11,6 +13,7 @@ class Manager(Thread):
     image = None
     instances = 1
     containers = []
+    controllers = []
 
     def get_image(self, tag):
         try:
@@ -59,8 +62,27 @@ class Manager(Thread):
 
     def _run_containers(self):
         for c in self.containers:
-            logger.info("running container '{0}'".format(c.name))
             c.start()
+
+    '''
+    does not take a docker.Container object, but the dict created in get_containers
+    '''
+    @staticmethod
+    def get_port(info, port):
+        for p in info.ports.items():
+            print(p)
+            if p[0] == port:
+                return p[1]
+        return None
+
+    def change_identity(self, name):
+        for i in self.get_containers():
+            if i["name"] == name:
+                with Controller.from_port(port=i["ports"]["9051/tcp"]) as c:
+                    c.authenticate()
+                    c.signal(Signal.NEWNYM)
+                return True
+        return False
 
     def get_containers(self):
         r = []
@@ -71,12 +93,10 @@ class Manager(Thread):
                 "short_id": c.short_id,
                 "name": c.name,
                 "status": c.status,
-                "ports": []
+                "ports": {}
             }
             for p in c.ports.items():
-                info["ports"].append({
-                    p[0]: p[1][0]["HostPort"]
-                })
+                info["ports"][p[0]] = p[1][0]["HostPort"]
             r.append(info)
         return r
 

@@ -21,7 +21,7 @@ class Server(object):
 
         @self.app.route("/api/rotate/<path:path>")
         def api_rotate(req, path):
-            return response.json({})  # todo use stem to change ip for instance
+            return response.json({"success": self.manager.change_identity(path)})
 
         @self.app.route("/api/create/<path:path>")
         def api_create(req, path):
