@@ -15,7 +15,8 @@ ex:
 $python3 docktor.py -i 4
 # runs 4 containers with tor
 
-curl http://127.0.0.1:1337/api/instances
+$curl http://127.0.0.1:1337/api/instances
+# should ouput something like this
 [
   {
     "id":"64b0cd480f6a9e1653d10556cf6c99138a2607b18f52415b0b60c6b7f75cdc4e",
