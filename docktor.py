@@ -16,8 +16,7 @@ class Manager(Thread):
     def get_image(self, tag):
         try:
             return self.client.images.get(tag)
-        except Exception as e:
-            logger.info(e)
+        except:
             return None
 
     def __init__(self, instances=16, directory="./", tag="docktor"):
@@ -34,29 +33,34 @@ class Manager(Thread):
     def get_container(self, name):
         try:
             return self.client.containers.get(name)
-        except Exception as e:
-            logger.info(e)
+        except:
             return None
 
-    def _run_containers(self):
-        logger.info("running {0} containers".format(self.instances))
+    def _create_containers(self):
         c = 0
         for i in range(self.instances):
             name = self.image.tags[0].split(":")[0] + "-" + str(c)
-            logger.info("going to run container '{0}'".format(name))
-            self.containers.append(self.client.containers.run(
-                self.image.tags[0],
-                name=name,
-                ports={
-                    '9050/tcp': None,
-                    '9051/tcp': None,
-                    '8123/tcp': None,
-                    '8118/tcp': None
-                },
-                detach=True,
-                auto_remove=True
-            ))
+            container = self.get_container(name)
+            if container is None:
+                logger.info("creating container '{0}'".format(name))
+                container = self.client.containers.create(
+                    self.image.tags[0],
+                    name=name,
+                    ports={
+                        '9050/tcp': None,
+                        '9051/tcp': None,
+                        '8123/tcp': None,
+                        '8118/tcp': None
+                    },
+                    detach=True,
+                    auto_remove=True
+                )
+            self.containers.append(container)
             c += 1
+
+    def _run_containers(self):
+        for c in self.containers:
+            c.start()
 
     def get_containers(self):
         r = []
@@ -84,6 +88,7 @@ class Manager(Thread):
                 print("\ttor: starting")
 
     def on_run(self):
+        self._create_containers()
         self._run_containers()
 
     def work(self):
