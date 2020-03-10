@@ -3,6 +3,7 @@ from loguru import logger
 from time import sleep
 from threading import Thread
 from sanic import Sanic, response
+from argparse import ArgumentParser
 
 
 class Manager(Thread):
@@ -60,19 +61,25 @@ class Manager(Thread):
 
     def _run_containers(self):
         for c in self.containers:
+            logger.info("running container '{0}'".format(c.name))
             c.start()
 
     def get_containers(self):
         r = []
         for c in self.containers:
-            r.append({
+            c.reload()
+            info = {
                 "id": c.id,
                 "short_id": c.short_id,
                 "name": c.name,
                 "status": c.status,
-                "ports": c.ports
-            })
-        logger.info(r)
+                "ports": []
+            }
+            for p in c.ports.items():
+                info["ports"].append({
+                    p[0]: p[1][0]["HostPort"]
+                })
+            r.append(info)
         return r
 
     def _check_containers(self):
@@ -148,6 +155,12 @@ class Server(object):
 
 
 if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument("--host", default="127.0.0.1", type=str)
+    parser.add_argument("--port", default=1337, type=int)
+    parser.add_argument("-i", "--instances", default=2, type=int)
+    a = parser.parse_args()
+
     logger.info("starting")
-    server = Server("127.0.0.1", 1337)
+    server = Server(a.host, a.port, a.instances)
     server.run()
