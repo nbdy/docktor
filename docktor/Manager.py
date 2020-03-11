@@ -80,7 +80,7 @@ class Manager(Thread):
 
     @staticmethod
     def change_identity(port):
-        with Controller.from_port(port=port) as c:
+        with Controller.from_port(port=int(port)) as c:
             c.authenticate()
             c.signal(Signal.NEWNYM)
         return True
