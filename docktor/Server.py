@@ -23,14 +23,6 @@ class Server(object):
         def api_rotate(req, path):
             return response.json({"success": self.manager.change_identity(path)})
 
-        @self.app.route("/api/create/<path:path>")
-        def api_create(req, path):
-            return response.json({})  # todo create new instance
-
-        @self.app.route("/api/kill/<path:path>")
-        def api_kill(req, path):
-            return response.json({})  # todo kill instance
-
         @self.app.listener('after_server_stop')
         async def after_stop(app, loop):
             self.manager.stop()

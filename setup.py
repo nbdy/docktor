@@ -19,6 +19,6 @@ setup(
     keywords="docker tor python",
     packages=find_packages(),
     package_data={
-
-    }  # todo
+        "doctor/data": ["data/*"]
+    }
 )
