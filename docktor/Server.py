@@ -9,7 +9,7 @@ class Server(object):
     host = None
     port = None
 
-    def __init__(self, host, port, instances=2):
+    def __init__(self, instances=2, host="127.0.0.1", port=1337):
         self.app = Sanic(__name__)
         self.host = host
         self.port = port
@@ -20,8 +20,12 @@ class Server(object):
             return response.json(self.manager.get_containers())
 
         @self.app.route("/api/rotate/<path:path>")
-        def api_rotate(req, path):
-            return response.json({"success": self.manager.change_identity(path)})
+        def api_rotate_one(req, path):
+            return response.json({"success": self.manager.change_container_identity(path)})
+
+        @self.app.route("/api/rotate")
+        def api_rotate_all(req):
+            return response.json({"success": self.manager.change_all_identities()})
 
         @self.app.listener('after_server_stop')
         async def after_stop(app, loop):

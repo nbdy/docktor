@@ -7,13 +7,13 @@ from stem import Signal
 
 
 class Manager(Thread):
+    daemon = True
     do_run = False
 
     client = None
     image = None
     instances = 1
     containers = []
-    controllers = []
 
     def get_image(self, tag):
         try:
@@ -62,27 +62,39 @@ class Manager(Thread):
 
     def _run_containers(self):
         for c in self.containers:
+            logger.info("running container '{0}'".format(c.name))
             c.start()
 
     '''
     does not take a docker.Container object, but the dict created in get_containers
+    :parameter info ^
+    :parameter port ex: 8118/tcp
+    :returns integer of the port
     '''
     @staticmethod
     def get_port(info, port):
-        for p in info.ports.items():
-            print(p)
+        for p in info["ports"].items():
             if p[0] == port:
-                return p[1]
+                return int(p[1])
         return None
 
-    def change_identity(self, name):
+    @staticmethod
+    def change_identity(port):
+        with Controller.from_port(port=port) as c:
+            c.authenticate()
+            c.signal(Signal.NEWNYM)
+        return True
+
+    def change_container_identity(self, name):
         for i in self.get_containers():
             if i["name"] == name:
-                with Controller.from_port(port=i["ports"]["9051/tcp"]) as c:
-                    c.authenticate()
-                    c.signal(Signal.NEWNYM)
-                return True
+                return self.change_identity(i["ports"]["9051/tcp"])
         return False
+
+    def change_all_identities(self):
+        for i in self.get_containers():
+            self.change_identity(i["ports"]["9051/tcp"])
+        return True
 
     def get_containers(self):
         r = []
@@ -100,30 +112,26 @@ class Manager(Thread):
             r.append(info)
         return r
 
-    def _check_containers(self):
-        for c in self.containers:
-            c.reload()
-            print(c.name + ":")
-            print("\tstatus:", c.status)
-            if b"Bootstrapped 100% (done): Done" in c.logs():
-                print("\ttor: bootstrapped")
-            elif b"stopped: tor" in c.logs():
-                print("\ttor: stopped")
-            else:
-                print("\ttor: starting")
+    def wait_until_ready(self):
+        logger.info("waiting till all containers are up and bootstrapped")
+        while True:
+            running_count = 0
+            for c in self.containers:
+                if b"Bootstrapped 100% (done): Done" in c.logs():
+                    running_count += 1
+            if running_count == len(self.containers):
+                break
+        logger.info("all containers should be up and ready")
 
     def on_run(self):
         self._create_containers()
         self._run_containers()
 
     def work(self):
-        # self._check_containers()
         sleep(10)
 
     def on_stop(self):
-        for c in self.containers:
-            c.kill()
-        self._check_containers()
+        pass  # since we auto remove containers there is no need to do anything here atm
 
     def run(self):
         self.on_run()

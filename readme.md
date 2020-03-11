@@ -44,3 +44,6 @@ $curl http://127.0.0.1:1337/api/instances
   }
 ]
 ```
+
+### notice:
+if your code crashes you might need to stop the containers by hand
