@@ -15,15 +15,18 @@ class Manager(Thread):
     instances = 1
     containers = []
 
+    control_password = None
+
     def get_image(self, tag):
         try:
             return self.client.images.get(tag)
         except:
             return None
 
-    def __init__(self, instances=16, directory="./", tag="docktor"):
+    def __init__(self, instances=16, control_password="docktor", directory="./", tag="docktor"):
         Thread.__init__(self)
         self.instances = instances
+        self.control_password = control_password
         self.client = docker.from_env()
         self.image = self.get_image(tag)
         if self.image is None:
@@ -78,10 +81,9 @@ class Manager(Thread):
                 return int(p[1])
         return None
 
-    @staticmethod
-    def change_identity(port):
+    def change_identity(self, port):
         with Controller.from_port(port=int(port)) as c:
-            c.authenticate()
+            c.authenticate(self.control_password)
             c.signal(Signal.NEWNYM)
         return True
 
