@@ -7,7 +7,8 @@ if __name__ == '__main__':
     parser.add_argument("--host", default="127.0.0.1", type=str)
     parser.add_argument("--port", default=1337, type=int)
     parser.add_argument("-i", "--instances", default=2, type=int)
+    parser.add_argument("--control-password", default="docktor", type=str)
     a = parser.parse_args()
 
-    server = Server(a.host, a.port, a.instances)
+    server = Server(a.host, a.port, a.instances, control_password=a.control_password)
     server.run()

@@ -9,11 +9,11 @@ class Server(object):
     host = None
     port = None
 
-    def __init__(self, instances=2, host="127.0.0.1", port=1337):
+    def __init__(self, instances=2, host="127.0.0.1", port=1337, **kwargs):
         self.app = Sanic(__name__)
         self.host = host
         self.port = port
-        self.manager = Manager(instances)
+        self.manager = Manager(instances, control_password=kwargs.get("control_password") or "docktor")
 
         @self.app.route("/api/instances")
         def api_instances(req):
