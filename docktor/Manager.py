@@ -84,7 +84,12 @@ class Manager(Thread):
     def change_identity(self, port):
         with Controller.from_port(port=int(port)) as c:
             c.authenticate(self.control_password)
+            if not c.is_newnym_available():
+                nnw = c.get_newnym_wait()
+                logger.info("sleeping {0} until next newnym is available".format(nnw))
+                sleep(nnw)
             c.signal(Signal.NEWNYM)
+            c.close()
         return True
 
     def change_container_identity(self, name):
@@ -130,10 +135,12 @@ class Manager(Thread):
         self._run_containers()
 
     def work(self):
-        sleep(10)
+        sleep(0.42)
 
     def on_stop(self):
-        pass  # since we auto remove containers there is no need to do anything here atm
+        logger.info("stopping containers")
+        for c in self.containers:
+            c.kill()
 
     def run(self):
         self.on_run()
