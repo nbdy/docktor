@@ -10,5 +10,5 @@ if __name__ == '__main__':
     parser.add_argument("--control-password", default="docktor", type=str)
     a = parser.parse_args()
 
-    server = Server(a.host, a.port, a.instances, control_password=a.control_password)
+    server = Server(a.instances, a.host, a.port, control_password=a.control_password)
     server.run()

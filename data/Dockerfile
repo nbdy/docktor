@@ -1,7 +1,5 @@
 FROM alpine:latest
 
-EXPOSE 8118 9050
-
 RUN apk --update add privoxy tor runit tini
 
 COPY service /etc/service/

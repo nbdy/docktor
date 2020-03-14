@@ -23,7 +23,7 @@ class Manager(Thread):
         except:
             return None
 
-    def __init__(self, instances=16, control_password="docktor", directory="./", tag="docktor"):
+    def __init__(self, instances=16, control_password="docktor", directory="./data/", tag="docktor"):
         Thread.__init__(self)
         self.instances = instances
         self.control_password = control_password
