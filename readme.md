@@ -12,7 +12,7 @@ optional arguments:
   -i INSTANCES, --instances INSTANCES
 
 ex:
-$python3 docktor.py -i 4
+$python3 docktor.py -i 2
 # runs 4 containers with tor
 
 $curl http://127.0.0.1:1337/api/instances
@@ -43,6 +43,11 @@ $curl http://127.0.0.1:1337/api/instances
     ]
   }
 ]
+
+# renew ip addresses for all containers
+curl http://127.0.0.1:1337/api/renew
+# renew ip address for one container
+curl http://127.0.0.1:1337/api/renew/docktor-0
 ```
 
 ### notice:
