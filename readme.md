@@ -1,6 +1,12 @@
 ## docktor
 #### manage and run multiple tor containers
 
+### how to...
+#### ...install
+```shell script
+pip3 install git+https://github.com/smthnspcl/docktor
+```
+
 ```shell script
 $python3 docktor.py --help
 usage: docktor.py [-h] [--host HOST] [--port PORT] [-i INSTANCES]
