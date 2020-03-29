@@ -6,20 +6,22 @@
 ```shell script
 pip3 install git+https://github.com/smthnspcl/docktor
 ```
-
+#### ...use from cli
 ```shell script
-$python3 docktor.py --help
-usage: docktor.py [-h] [--host HOST] [--port PORT] [-i INSTANCES]
+$docktor --help
+usage: docktor [-h] [--host HOST] [--port PORT] [-i INSTANCES]
+               [--control-password CONTROL_PASSWORD]
 
 optional arguments:
   -h, --help            show this help message and exit
   --host HOST
   --port PORT
   -i INSTANCES, --instances INSTANCES
+  --control-password CONTROL_PASSWORD
 
 ex:
-$python3 docktor.py -i 2
-# runs 4 containers with tor
+$docktor -i 2
+# runs 2 tor containers
 
 $curl http://127.0.0.1:1337/api/instances
 # should ouput something like this
@@ -54,6 +56,16 @@ $curl http://127.0.0.1:1337/api/instances
 curl http://127.0.0.1:1337/api/renew
 # renew ip address for one container
 curl http://127.0.0.1:1337/api/renew/docktor-0
+```
+
+#### ...use from code
+```python
+from docktor import Manager
+manager = Manager(2)
+manager.start()
+manager.wait_until_ready()
+print(manager.get_containers())
+manager.stop()
 ```
 
 ### notice:
