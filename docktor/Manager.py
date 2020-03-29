@@ -9,6 +9,7 @@ from stem import Signal
 class Manager(Thread):
     daemon = True
     do_run = False
+    debug = False
 
     client = None
     image = None
@@ -18,13 +19,29 @@ class Manager(Thread):
     control_password = None
 
     def get_image(self, tag):
+        """
+        gets image from docker client
+        :param tag: image tag
+        :return: Image object or None if Image could not be found
+        """
         try:
             return self.client.images.get(tag)
-        except:
+        except Exception as e:
+            if self.debug:
+                logger.exception(e)
             return None
 
-    def __init__(self, instances=16, control_password="docktor", directory="./data/", tag="docktor"):
+    def __init__(self, instances=16, control_password="docktor", directory="./data/", tag="docktor", debug=False):
+        """
+        initializes Manager object
+        :param instances: number of desired instances
+        :param control_password: tor control password for ALL containers
+        :param directory: data directory which contains the Dockerfile and so on
+        :param tag: Container tag
+        :param debug: be more verbose
+        """
         Thread.__init__(self)
+        self.debug = debug
         self.instances = instances
         self.control_password = control_password
         self.client = docker.from_env()
@@ -36,12 +53,23 @@ class Manager(Thread):
         self.do_run = True
 
     def get_container(self, name):
+        """
+        gets container by name from docker
+        :param name: container name
+        :return: Container object or None if Container does not exist
+        """
         try:
             return self.client.containers.get(name)
-        except:
+        except Exception as e:
+            if self.debug:
+                logger.exception(e)
             return None
 
     def _create_containers(self):
+        """
+        creates containers
+        :return: None
+        """
         c = 0
         for i in range(self.instances):
             name = self.image.tags[0].split(":")[0] + "-" + str(c)
@@ -64,24 +92,35 @@ class Manager(Thread):
             c += 1
 
     def _run_containers(self):
+        """
+        calls .start() on all containers
+        :return: None
+        """
         for c in self.containers:
             logger.info("running container '{0}'".format(c.name))
             c.start()
 
-    '''
-    does not take a docker.Container object, but the dict created in get_containers
-    :parameter info ^
-    :parameter port ex: 8118/tcp
-    :returns integer of the port
-    '''
-    @staticmethod
-    def get_port(info, port):
+    def get_port(self, info, port):
+        """
+        does not take a docker.Container object, but the dict created in get_containers
+        :param info: ^
+        :param port: ex: 8118/tcp
+        :return: integer of the port
+        """
+        if self.debug:
+            logger.debug("getting forwarded port for {0}".format(port))
+            logger.debug(info)
         for p in info["ports"].items():
             if p[0] == port:
                 return int(p[1])
         return None
 
     def change_identity(self, port):
+        """
+        changes the identity (ip) of the corresponding container
+        :param port: control port of container
+        :return: returns True when done
+        """
         with Controller.from_port(port=int(port)) as c:
             c.authenticate(self.control_password)
             if not c.is_newnym_available():
@@ -93,17 +132,29 @@ class Manager(Thread):
         return True
 
     def change_container_identity(self, name):
+        """
+        changes container identity
+        :param name: name of container
+        :return: True when identity was changed or False if container could not be found
+        """
         for i in self.get_containers():
             if i["name"] == name:
                 return self.change_identity(i["ports"]["9051/tcp"])
         return False
 
     def change_all_identities(self):
+        """
+        changes identities of all containers
+        :return: True when done
+        """
         for i in self.get_containers():
             self.change_identity(i["ports"]["9051/tcp"])
         return True
 
     def get_containers(self):
+        """
+        :return: dict list of all containers
+        """
         r = []
         for c in self.containers:
             c.reload()
@@ -120,6 +171,10 @@ class Manager(Thread):
         return r
 
     def wait_until_ready(self):
+        """
+        waits until all tor instances in all containers are bootstrapped
+        :return: None
+        """
         logger.info("waiting till all containers are up and bootstrapped")
         while True:
             running_count = 0
@@ -131,22 +186,43 @@ class Manager(Thread):
         logger.info("all containers should be up and ready")
 
     def on_run(self):
+        """
+        creates and runs containers
+        :return: None
+        """
         self._create_containers()
         self._run_containers()
 
-    def work(self):
+    @staticmethod
+    def work():
+        """
+        does nothing
+        :return: None
+        """
         sleep(0.42)
 
     def on_stop(self):
+        """
+        stops / kills containers
+        :return: None
+        """
         logger.info("stopping containers")
         for c in self.containers:
             c.kill()
 
     def run(self):
+        """
+        calls on_run / work / on_stop
+        :return: None
+        """
         self.on_run()
         while self.do_run:
             self.work()
         self.on_stop()
 
     def stop(self):
+        """
+        sets do_run to false (basically stops the manager)
+        :return: None
+        """
         self.do_run = False
