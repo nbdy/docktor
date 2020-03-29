@@ -1,8 +1,8 @@
 from argparse import ArgumentParser
-from docktor import Server
+from . import Server
 
 
-if __name__ == '__main__':
+def main():
     parser = ArgumentParser()
     parser.add_argument("--host", default="127.0.0.1", type=str)
     parser.add_argument("--port", default=1337, type=int)
@@ -12,3 +12,7 @@ if __name__ == '__main__':
 
     server = Server(a.instances, a.host, a.port, control_password=a.control_password)
     server.run()
+
+
+if __name__ == '__main__':
+    main()
