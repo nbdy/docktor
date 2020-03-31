@@ -18,6 +18,7 @@ setup(
     ],
     keywords="docker tor python",
     packages=find_packages(),
+    package_dir={'docktor': 'docktor'},
     package_data={
         "data": ["data/*"]
     },
