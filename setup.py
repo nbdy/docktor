@@ -19,7 +19,7 @@ setup(
     keywords="docker tor python",
     packages=find_packages(),
     package_data={
-        "docktor/data": ["data/*"]
+        "data": ["data/*"]
     },
     entry_points={'console_scripts': ['docktor = docktor.__main__:main']},
     install_requires=open("requirements.txt").readlines()
