@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from . import Server
+from docktor import Server
 
 
 def main():

@@ -1,6 +1,6 @@
 from sanic import Sanic, response
 
-from . import Manager
+from docktor import Manager
 
 
 class Server(object):
