@@ -4,7 +4,11 @@
 ### how to...
 #### ...install
 ```shell script
-pip3 install git+https://github.com/smthnspcl/docktor
+curl -sSL https://raw.githubusercontent.com/smthnspcl/docktor/master/install.sh | bash
+# or
+git clone https://github.com/smthnspcl/docktor
+cd docktor
+sudo python3 setup.py install
 ```
 #### ...use from cli
 ```shell script
