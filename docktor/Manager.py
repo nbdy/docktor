@@ -4,6 +4,7 @@ from loguru import logger
 from threading import Thread
 from stem.control import Controller
 from stem import Signal
+from docktor import DATA_PATH
 
 
 class Manager(Thread):
@@ -31,7 +32,7 @@ class Manager(Thread):
                 logger.exception(e)
             return None
 
-    def __init__(self, instances=16, control_password="docktor", directory="./data/", tag="docktor", debug=False):
+    def __init__(self, instances=16, control_password="docktor", directory=DATA_PATH, tag="docktor", debug=False):
         """
         initializes Manager object
         :param instances: number of desired instances
