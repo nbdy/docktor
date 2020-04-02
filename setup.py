@@ -20,9 +20,9 @@ setup(
     packages=find_packages(),
     package_dir={'docktor': 'docktor'},
     package_data={
-        "data": ["data/*"]
+        "data": ["docktor/data/*"]
     },
+    include_package_data=True,
     entry_points={'console_scripts': ['docktor = docktor.__main__:main']},
-    install_requires=open("requirements.txt").readlines(),
-    include_package_data=True
+    install_requires=open("requirements.txt").readlines()
 )
