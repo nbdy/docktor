@@ -24,5 +24,5 @@ setup(
     },
     entry_points={'console_scripts': ['docktor = docktor.__main__:main']},
     install_requires=open("requirements.txt").readlines(),
-    include_package_data=True,
+    include_package_data=True
 )
