@@ -14,7 +14,7 @@ class Server(object):
         self.host = host
         self.port = port
         self.manager = Manager(instances, control_password=kwargs.get("control_password") or "docktor",
-                               debug=kwargs.get("debug") or False)
+                               debug=kwargs.get("debug") or False, directory=kwargs.get("data_directory"))
 
         @self.app.route("/api/instances")
         def api_instances(req):
