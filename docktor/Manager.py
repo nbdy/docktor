@@ -43,6 +43,8 @@ class Manager(Thread):
         """
         Thread.__init__(self)
         self.debug = debug
+        if self.debug:
+            logger.debug("using data directory: {0}".format(directory))
         self.instances = instances
         self.control_password = control_password
         self.client = docker.from_env()
