@@ -13,7 +13,8 @@ class Server(object):
         self.app = Sanic(__name__)
         self.host = host
         self.port = port
-        self.manager = Manager(instances, control_password=kwargs.get("control_password") or "docktor")
+        self.manager = Manager(instances, control_password=kwargs.get("control_password") or "docktor",
+                               debug=kwargs.get("debug") or False)
 
         @self.app.route("/api/instances")
         def api_instances(req):
