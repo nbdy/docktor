@@ -2,8 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    long_description_content_type="text/markdown",
-    long_description=open("readme.md", "r").read(),
+    long_description=open("README.rst", "r").read(),
     name="docktor",
     version="0.42",
     description="starts n tor docker containers with an api",

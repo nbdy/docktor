@@ -1,4 +1,5 @@
 ## docktor
+[![Build Status](https://build.eberlein.io/buildStatus/icon?job=python_docktor)](https://build.eberlein.io/job/python_docktor/)
 #### manage and run multiple tor containers
 
 ### how to...
