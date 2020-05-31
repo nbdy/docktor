@@ -5,6 +5,8 @@
 ### how to...
 #### ...install
 ```shell script
+pip3 install docktor
+# or
 curl -sSL https://raw.githubusercontent.com/smthnspcl/docktor/master/install.sh | bash
 # or
 git clone https://github.com/smthnspcl/docktor
